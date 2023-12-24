@@ -1,0 +1,16 @@
+{
+	"files.autoSave": "afterDelay",
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+
+	"[toml]": {
+		"editor.defaultFormatter": "tamasfe.even-better-toml"
+	},
+
+	"files.associations": {
+		"*ignore-sync": "ini"
+	},
+
+	// disable to use type definitions in node_modules
+	"typescript.disableAutomaticTypeAcquisition": true
+}

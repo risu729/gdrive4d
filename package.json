@@ -1,0 +1,11 @@
+{
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "gdrive4d",
+	"private": true,
+	"devDependencies": {
+		"@tsconfig/bun": "1.0.1",
+		"bun-types": "latest",
+		"ignore-sync": "7.0.1",
+		"typescript": "5.3.3"
+	}
+}
