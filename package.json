@@ -2,7 +2,11 @@
 	"$schema": "https://json.schemastore.org/package.json",
 	"name": "gdrive4d",
 	"private": true,
+	"scripts": {
+		"check": "biome check --apply-unsafe ."
+	},
 	"devDependencies": {
+		"@biomejs/biome": "1.4.1",
 		"@tsconfig/bun": "1.0.1",
 		"bun-types": "latest",
 		"ignore-sync": "7.0.1",
