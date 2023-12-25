@@ -7,6 +7,6 @@
 		":pinVersions",
 		":automergeMinor",
 		":prHourlyLimitNone",
-    ":prConcurrentLimitNone"
+		":prConcurrentLimitNone"
 	]
 }
