@@ -1,6 +1,12 @@
 declare module "bun" {
 	interface Env {
 		/**
+		 * Application ID of the Discord bot.
+		 */
+		// biome-ignore lint/style/useNamingConvention: should be SCREAMING_SNAKE_CASE
+		DISCORD_BOT_APPLICATION_ID: string;
+
+		/**
 		 * Token of the Discord bot.
 		 */
 		// biome-ignore lint/style/useNamingConvention:

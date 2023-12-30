@@ -8,6 +8,7 @@ import {
 	PartialMessage,
 	PermissionFlagsBits,
 } from "discord.js";
+import { commandsListener, registerCommands } from "./commands";
 import { deleteEmbedsMessage, updateEmbedsMessage } from "./embeds";
 import { driveClient } from "./gdrive";
 
@@ -34,12 +35,16 @@ const discordClient = new Client({
 	],
 });
 
-discordClient.once(Events.ClientReady, (client) => {
+discordClient.once(Events.ClientReady, async (client) => {
 	console.info("Discord bot is now ready!");
 	console.info(`Logged in as ${client.user.tag}.`);
 
+	await registerCommands(client);
+
 	client.user.setActivity("Google Drive", { type: ActivityType.Watching });
 });
+
+discordClient.on(Events.InteractionCreate, commandsListener);
 
 const isValidRequest = (message: Message | PartialMessage): boolean => {
 	// ignore self messages
