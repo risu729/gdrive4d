@@ -8,6 +8,11 @@ const invisibleChars = Array.from(
 		0x2060 + i,
 );
 
+/**
+ * Encode a string into invisible string.
+ * @param str string to encode
+ * @returns encoded invisible string
+ */
 const encode = (str: string): string => {
 	const nibbles = Array.from(new TextEncoder().encode(str))
 		// byte is an octet
@@ -18,6 +23,11 @@ const encode = (str: string): string => {
 	return String.fromCodePoint(...nibbles);
 };
 
+/**
+ * Decode an invisible string into a string.
+ * @param encoded invisible string to decode
+ * @returns decoded string
+ */
 const decode = (encoded: string): string => {
 	// convert to codePoints to handle surrogate pairs in encoded
 	const nibbles = Array.from(encoded)
@@ -42,10 +52,21 @@ const decode = (encoded: string): string => {
 	return new TextDecoder().decode(bytes);
 };
 
+/**
+ * Append an invisible string to a visible string.
+ * @param visible string to append to
+ * @param invisible string to encode and append
+ * @returns appended string
+ */
 export const appendInvisible = (visible: string, invisible: string): string => {
 	return `${visible}${encode(invisible)}`;
 };
 
+/**
+ * Decode the invisible string appended to a visible string.
+ * @param text string with invisible string to decode appended
+ * @returns decoded string
+ */
 export const decodeAppendedInvisible = (text: string): string => {
 	const indexOfInvisible = Math.min(
 		...invisibleChars
