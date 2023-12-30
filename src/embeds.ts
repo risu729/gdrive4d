@@ -165,6 +165,7 @@ export const updateEmbedsMessage = async (
 	}
 
 	if (
+		oldEmbedsMessage.embeds?.length === newEmbedsMessage.embeds?.length &&
 		oldEmbedsMessage.embeds?.every(({ data: oldEmbedData }, i) => {
 			const newEmbed = newEmbedsMessage.embeds?.[i];
 			if (!newEmbed) {
