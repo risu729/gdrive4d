@@ -6,6 +6,7 @@ import {
 	GatewayIntentBits,
 	Message,
 	PartialMessage,
+	Partials,
 	PermissionFlagsBits,
 } from "discord.js";
 import { commandsListener, registerCommands } from "./commands";
@@ -33,6 +34,7 @@ const discordClient = new Client({
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.MessageContent,
 	],
+	partials: [Partials.Message],
 });
 
 discordClient.once(Events.ClientReady, async (client) => {
