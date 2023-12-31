@@ -46,7 +46,7 @@ export const commands: ExecutableCommand[] = [
 			.setName("Update Embeds")
 			.toJSON(),
 		execute: async (interaction) => {
-			interaction.deferReply();
+			interaction.deferReply({ ephemeral: true });
 			await updateEmbedsMessage(interaction.targetMessage);
 			interaction.deleteReply();
 		},
