@@ -44,6 +44,46 @@ discordClient.once(Events.ClientReady, async (client) => {
 	await registerCommands(client);
 
 	client.user.setActivity("Google Drive", { type: ActivityType.Watching });
+
+	const guilds = client.guilds.cache;
+	if (!guilds.has(env.DISCORD_GUILD_ID)) {
+		// exit if the bot is not in the target guild
+		console.error(`Bot is not in the target guild ${env.DISCORD_GUILD_ID}.`);
+		// bun does not exit with a thrown error in listener
+		process.exit(1);
+	}
+
+	// exit if the bot is missing some required permissions
+	const requiredPermissions = [
+		PermissionFlagsBits.ViewChannel,
+		PermissionFlagsBits.SendMessages,
+		PermissionFlagsBits.SendMessagesInThreads,
+		// required to send embeds
+		PermissionFlagsBits.EmbedLinks,
+		PermissionFlagsBits.ReadMessageHistory,
+		// required to suppress embeds of original messages
+		PermissionFlagsBits.ManageMessages,
+	];
+	// biome-ignore lint/style/noNonNullAssertion: already ensured that the bot is in the target guild
+	const bot = await guilds.get(env.DISCORD_GUILD_ID)!.members.fetchMe();
+	const missingPermissions = bot.permissions.missing(requiredPermissions);
+	if (missingPermissions.length) {
+		console.error(
+			`Bot is missing the following required permissions: ${missingPermissions.join(
+				", ",
+			)}.`,
+		);
+		// bun does not exit with a thrown error in listener
+		process.exit(1);
+	}
+
+	// leave unauthorized guilds
+	for (const [id, guild] of guilds) {
+		if (id !== env.DISCORD_GUILD_ID) {
+			await guild.leave();
+			console.warn(`Left unauthorized guild ${guild.name} (${id}).`);
+		}
+	}
 });
 
 discordClient.on(Events.InteractionCreate, commandsListener);
