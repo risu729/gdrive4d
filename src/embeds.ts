@@ -4,6 +4,10 @@ import {
 	BaseMessageOptions,
 	EmbedBuilder,
 	Message,
+	MessageCreateOptions,
+	MessageEditOptions,
+	MessageFlags,
+	MessageFlagsBitField,
 	PartialMessage,
 	isJSONEncodable,
 } from "discord.js";
@@ -76,7 +80,9 @@ const retrieveOldEmbedsMessage = async (
 const createEmbedsMessage = async ({
 	content,
 	id: sourceId,
-}: Message): Promise<BaseMessageOptions | undefined> => {
+}: Message): Promise<
+	(MessageCreateOptions & MessageEditOptions) | undefined
+> => {
 	const fileIds = extractFileIds(content);
 	const files = await Promise.all(
 		fileIds.map((id) =>
@@ -131,6 +137,7 @@ const createEmbedsMessage = async ({
 				.setTimestamp(new Date(modifiedTime))
 				.toJSON();
 		}),
+		flags: MessageFlagsBitField.resolve(MessageFlags.SuppressNotifications),
 	};
 };
 
