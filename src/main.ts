@@ -14,6 +14,20 @@ import { commandsListener, registerCommands } from "./commands";
 import { deleteEmbedsMessage, updateEmbedsMessage } from "./embeds";
 import { driveClient } from "./gdrive";
 
+// check environment variables are set
+for (const name of [
+	"DISCORD_BOT_TOKEN",
+	"DISCORD_GUILD_ID",
+	"GOOGLE_SERVICE_ACCOUNT_EMAIL",
+	"GOOGLE_SERVICE_ACCOUNT_KEY",
+]) {
+	if (!env[name]) {
+		throw new Error(
+			`Environment variable ${name} is not set. Set it in .env file.`,
+		);
+	}
+}
+
 console.info("Starting Google Drive API client...");
 console.info(`Service account email: ${env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`);
 // test if the client is working, fail fast
