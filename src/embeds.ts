@@ -1,7 +1,8 @@
 import { drive_v3 } from "@googleapis/drive";
 import { deepMatch, sleep } from "bun";
+// @ts-expect-error: no types
+import compareUrls from "compare-urls";
 import {
-	BaseMessageOptions,
 	EmbedBuilder,
 	Message,
 	MessageCreateOptions,
@@ -18,16 +19,19 @@ import { appendInvisible, decodeAppendedInvisible } from "./util";
 /**
  * Extract Google Drive file IDs from a string.
  * @param content string to extract file IDs from
- * @returns extracted file IDs
+ * @returns array of URLs and file IDs
  */
-const extractFileIds = (content: string): string[] => {
+const extractFileIds = (content: string): { url: string; fileId: string }[] => {
 	// file ID is the path segment after d (files), e (forms), or folders
 	// ref: https://github.com/spamscanner/url-regex-safe/blob/6c1e2c3b5557709633a2cc971d599469ea395061/src/index.js#L80
 	// ref: https://stackoverflow.com/questions/16840038/easiest-way-to-get-file-id-from-url-on-google-apps-script
 	const regex =
 		/https?:\/\/(?:drive|docs)\.google\.com\/[^\s'"\)]+\/(?:d|e|folders)\/([-\w]{25,})(?:\/[^\s'"\)]*[^\s"\)'.?!])?/g;
-	// biome-ignore lint/style/noNonNullAssertion: the first matching group is always defined if the regex matches
-	return [...content.matchAll(regex)].map(([, id]) => id!);
+	return [...content.matchAll(regex)].map(([url, id]) => ({
+		url,
+		// biome-ignore lint/style/noNonNullAssertion: the first matching group is always defined if the regex matches
+		fileId: id!,
+	}));
 };
 
 /**
@@ -77,13 +81,10 @@ const retrieveOldEmbedsMessage = async (
  * @param message source message
  * @returns embeds message, or undefined if no embeds are created
  */
-const createEmbedsMessage = async ({
-	content,
-	id: sourceId,
-}: Message): Promise<
-	(MessageCreateOptions & MessageEditOptions) | undefined
-> => {
-	const fileIds = extractFileIds(content);
+const createEmbedsMessage = async (
+	fileIds: string[],
+	sourceId: string,
+): Promise<(MessageCreateOptions & MessageEditOptions) | undefined> => {
 	const files = await Promise.all(
 		fileIds.map((id) =>
 			driveClient.files
@@ -142,66 +143,118 @@ const createEmbedsMessage = async ({
 };
 
 /**
+ * Suppress default embeds of Google Drive links in a message.
+ * @param message message to suppress embeds in
+ * @param fileUrls URLs of files to suppress embeds of
+ */
+const suppressEmbeds = async (message: Message, fileUrls: string[]) => {
+	const embedsUrls = message.embeds.map(({ url }) => url);
+	const shouldSuppress =
+		!!embedsUrls.length &&
+		embedsUrls.every(
+			// return false if null, which means the embed is not a link
+			(embedUrl) =>
+				embedUrl && fileUrls.some((fileUrl) => compareUrls(fileUrl, embedUrl)),
+		);
+
+	// do not send a request if no change is needed
+	if (message.flags.has(MessageFlags.SuppressEmbeds) === shouldSuppress) {
+		return;
+	}
+	await message.suppressEmbeds(shouldSuppress);
+};
+
+/**
  * Update the embeds message of a source message.
  * @param sourceMessage source message
  * @param newlyCreated whether the source message is newly created
  */
 export const updateEmbedsMessage = async (
 	sourceMessage: Message,
-	newlyCreated = false,
+	options:
+		| { [k: string]: never }
+		| {
+				isNewlyCreated: boolean;
+		  }
+		| {
+				isEmbedsSuppressed: boolean;
+		  } = {},
 ) => {
+	const isNewlyCreated = "isNewlyCreated" in options && options.isNewlyCreated;
+	const isEmbedsSuppressed =
+		"isEmbedsSuppressed" in options && options.isEmbedsSuppressed;
+
+	const fileIds = extractFileIds(sourceMessage.content);
 	const [oldEmbedsMessage, newEmbedsMessage] = await Promise.all([
 		// skip retrieving old embeds message if the source message is newly created
-		// retry twice because the old embeds might not be sent yet when the source is updated in quick succession
-		newlyCreated ? undefined : retrieveOldEmbedsMessage(sourceMessage, 2),
-		createEmbedsMessage(sourceMessage),
+		isNewlyCreated
+			? undefined
+			: // retry twice because the old embeds might not be sent yet when the source is updated in quick succession
+			  retrieveOldEmbedsMessage(sourceMessage, 2),
+		createEmbedsMessage(
+			fileIds.map(({ fileId }) => fileId),
+			sourceMessage.id,
+		),
 	]);
 
-	if (!oldEmbedsMessage) {
-		if (!newEmbedsMessage) {
+	// use try-finally to suppress embeds even if an error is thrown
+	try {
+		if (!oldEmbedsMessage) {
+			if (!newEmbedsMessage) {
+				return;
+			}
+
+			await sourceMessage.channel.send(newEmbedsMessage);
 			return;
 		}
 
-		await sourceMessage.channel.send(newEmbedsMessage);
+		if (!newEmbedsMessage) {
+			await oldEmbedsMessage.delete();
+			return;
+		}
+
+		if (
+			oldEmbedsMessage.embeds?.length === newEmbedsMessage.embeds?.length &&
+			oldEmbedsMessage.embeds?.every(({ data: oldEmbedData }, i) => {
+				const newEmbed = newEmbedsMessage.embeds?.[i];
+				if (!newEmbed) {
+					return false;
+				}
+				const newEmbedData = isJSONEncodable(newEmbed)
+					? newEmbed.toJSON()
+					: newEmbed;
+
+				// do not use Embed#equals because it compares timestamps just as strings
+				return (
+					new Date(oldEmbedData.timestamp ?? 0).getTime() ===
+						new Date(newEmbedData.timestamp ?? 0).getTime() &&
+					// oldEmbedData includes some extra properties like `type` or `content_scan_version`
+					deepMatch(
+						Object.fromEntries(
+							Object.entries(newEmbedData).filter(
+								([key]) => key !== "timestamp",
+							),
+						),
+						oldEmbedData,
+					)
+				);
+			})
+		) {
+			// do not edit if the embeds are the same to avoid `(edited)` in the message
+			return;
+		}
+
+		await oldEmbedsMessage.edit(newEmbedsMessage);
 		return;
-	}
-
-	if (!newEmbedsMessage) {
-		await oldEmbedsMessage.delete();
-		return;
-	}
-
-	if (
-		oldEmbedsMessage.embeds?.length === newEmbedsMessage.embeds?.length &&
-		oldEmbedsMessage.embeds?.every(({ data: oldEmbedData }, i) => {
-			const newEmbed = newEmbedsMessage.embeds?.[i];
-			if (!newEmbed) {
-				return false;
-			}
-			const newEmbedData = isJSONEncodable(newEmbed)
-				? newEmbed.toJSON()
-				: newEmbed;
-
-			// do not use Embed#equals because it compares timestamps just as strings
-			return (
-				new Date(oldEmbedData.timestamp ?? 0).getTime() ===
-					new Date(newEmbedData.timestamp ?? 0).getTime() &&
-				// oldEmbedData includes some extra properties like `type` or `content_scan_version`
-				deepMatch(
-					Object.fromEntries(
-						Object.entries(newEmbedData).filter(([key]) => key !== "timestamp"),
-					),
-					oldEmbedData,
-				)
+	} finally {
+		// skip when embeds are suppressed in the source message to avoid infinite recursion
+		if (!isEmbedsSuppressed) {
+			await suppressEmbeds(
+				sourceMessage,
+				fileIds.map(({ url }) => url),
 			);
-		})
-	) {
-		// do not edit if the embeds are the same to avoid `(edited)` in the message
-		return;
+		}
 	}
-
-	await oldEmbedsMessage.edit(newEmbedsMessage);
-	return;
 };
 
 /**
