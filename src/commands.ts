@@ -66,7 +66,7 @@ export const registerCommands = async (client: Client<true>) => {
 		await client.rest.put(
 			// register as guild commands to avoid accessing data from DMs or other guilds
 			Routes.applicationGuildCommands(
-				env.DISCORD_BOT_APPLICATION_ID,
+				client.application.id,
 				env.DISCORD_GUILD_ID,
 			),
 			{ body },
