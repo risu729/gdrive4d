@@ -15,7 +15,7 @@
     "@biomejs/biome": "1.4.1",
     "@tsconfig/bun": "1.0.1",
     "@tsconfig/strictest": "2.0.2",
-    "bun-types": "latest",
+    "bun-types": "1.0.20",
     "ignore-sync": "7.0.1",
     "typescript": "5.3.3"
   }
