@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@googleapis/drive": "8.4.0",
+    "compare-urls": "4.0.0",
     "discord.js": "14.14.1"
   },
   "devDependencies": {

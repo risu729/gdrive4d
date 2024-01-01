@@ -5,6 +5,7 @@ import {
 	Events,
 	GatewayIntentBits,
 	Message,
+	MessageFlags,
 	PartialMessage,
 	Partials,
 	PermissionFlagsBits,
@@ -110,23 +111,25 @@ discordClient.on(Events.MessageCreate, async (message) => {
 	if (!isValidRequest(message)) {
 		return;
 	}
-	await updateEmbedsMessage(message, true);
+	await updateEmbedsMessage(message, { isNewlyCreated: true });
 });
 
-discordClient.on(Events.MessageUpdate, async (_, newMessage) => {
+discordClient.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 	if (!isValidRequest(newMessage)) {
-		return;
-	}
-	// ignore embeds only updates events, which are triggered immediately after MessageCreate
-	if (newMessage.editedTimestamp === null) {
 		return;
 	}
 
 	// retrieve the full message to get the content
-	const fullMessage = newMessage.partial
+	const fullNewMessage = newMessage.partial
 		? await newMessage.fetch()
 		: newMessage;
-	await updateEmbedsMessage(fullMessage);
+	await updateEmbedsMessage(fullNewMessage, {
+		isEmbedsSuppressed:
+			// do not treat the event as suppressed if the old message is partial
+			!(
+				oldMessage.partial || oldMessage.flags.has(MessageFlags.SuppressEmbeds)
+			) && fullNewMessage.flags.has(MessageFlags.SuppressEmbeds),
+	});
 });
 
 discordClient.on(Events.MessageDelete, async (message) => {
