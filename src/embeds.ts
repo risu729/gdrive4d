@@ -104,7 +104,6 @@ const createEmbedsMessage = async (
 					) {
 						return undefined;
 					}
-					console.error(error);
 					throw error;
 				}),
 		),

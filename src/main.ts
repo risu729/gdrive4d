@@ -1,4 +1,5 @@
 import { env } from "bun";
+import { consola } from "consola";
 import {
 	ActivityType,
 	Client,
@@ -8,25 +9,29 @@ import {
 	MessageFlags,
 	PartialMessage,
 	Partials,
-	PermissionFlagsBits,
 } from "discord.js";
+import { checkBotStatus, checkEnvs } from "./checks";
 import { commandsListener, registerCommands } from "./commands";
 import { deleteEmbedsMessage, updateEmbedsMessage } from "./embeds";
 import { driveClient } from "./gdrive";
 
-console.info("Starting Google Drive API client...");
-console.info(`Service account email: ${env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`);
+consola.start("gdrive4d is starting...");
+
+checkEnvs();
+
+consola.start("Starting Google Drive API client...");
+consola.info(`Service account email: ${env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`);
 // test if the client is working, fail fast
 const files = await driveClient.files.list();
 // exit if the service account has access to no files
 if (!files.data.files?.length) {
-	throw new Error(
-		"No files are shared to the service account in Google Drive.",
+	consola.warn(
+		"No files are shared to the service account in Google Drive. Share some files to the service account and try again.",
 	);
 }
-console.info("Google Drive API client is now ready!");
+consola.ready("Google Drive API client is now ready!");
 
-console.info("Starting Discord bot...");
+consola.start("Starting Discord bot...");
 const discordClient = new Client({
 	intents: [
 		// required to receive messages
@@ -39,52 +44,16 @@ const discordClient = new Client({
 });
 
 discordClient.once(Events.ClientReady, async (client) => {
-	console.info("Discord bot is now ready!");
-	console.info(`Logged in as ${client.user.tag}.`);
-
-	await registerCommands(client);
+	consola.ready("Discord bot is now ready!");
+	consola.info(`Logged in as ${client.user.tag}.`);
 
 	client.user.setActivity("Google Drive", { type: ActivityType.Watching });
 
-	const guilds = client.guilds.cache;
-	if (!guilds.has(env.DISCORD_GUILD_ID)) {
-		// exit if the bot is not in the target guild
-		console.error(`Bot is not in the target guild ${env.DISCORD_GUILD_ID}.`);
-		// bun does not exit with a thrown error in listener
-		process.exit(1);
-	}
+	await checkBotStatus(client);
 
-	// exit if the bot is missing some required permissions
-	const requiredPermissions = [
-		PermissionFlagsBits.ViewChannel,
-		PermissionFlagsBits.SendMessages,
-		PermissionFlagsBits.SendMessagesInThreads,
-		// required to send embeds
-		PermissionFlagsBits.EmbedLinks,
-		PermissionFlagsBits.ReadMessageHistory,
-		// required to suppress embeds of original messages
-		PermissionFlagsBits.ManageMessages,
-	];
-	// biome-ignore lint/style/noNonNullAssertion: already ensured that the bot is in the target guild
-	const bot = await guilds.get(env.DISCORD_GUILD_ID)!.members.fetchMe();
-	const missingPermissions = bot.permissions.missing(requiredPermissions);
-	if (missingPermissions.length) {
-		console.error(
-			`Bot is missing the following required permissions: ${missingPermissions.join(
-				", ",
-			)}.`,
-		);
-		// bun does not exit with a thrown error in listener
-		process.exit(1);
-	}
+	await registerCommands(client);
 
-	// leave unauthorized guilds
-	for (const [id, guild] of guilds) {
-		if (id !== env.DISCORD_GUILD_ID) {
-			await guild.leave();
-			console.warn(`Left unauthorized guild ${guild.name} (${id}).`);
-		}
-	}
+	consola.ready("gdrive4d is successfully started!");
 });
 
 discordClient.on(Events.InteractionCreate, commandsListener);
@@ -97,7 +66,7 @@ const isValidRequest = (message: Message | PartialMessage): boolean => {
 	}
 	// ignore commands from unauthorized guilds or DMs
 	if (message.guildId !== env.DISCORD_GUILD_ID) {
-		console.warn(
+		consola.warn(
 			`Message event was sent in ${
 				message.inGuild() ? "an unauthorized guild" : "DM"
 			}.`,
