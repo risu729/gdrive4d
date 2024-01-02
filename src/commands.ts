@@ -1,4 +1,5 @@
 import { env } from "bun";
+import { consola } from "consola";
 import {
 	ApplicationCommandType,
 	type ChatInputCommandInteraction,
@@ -58,7 +59,7 @@ export const commands: ExecutableCommand[] = [
  * @param client client used to register commands
  */
 export const registerCommands = async (client: Client<true>) => {
-	console.info("Registering application commands...");
+	consola.start("Registering application commands...");
 	try {
 		const body: RESTPutAPIApplicationGuildCommandsJSONBody = commands.map(
 			(command) => command.data,
@@ -72,13 +73,14 @@ export const registerCommands = async (client: Client<true>) => {
 			{ body },
 		);
 
-		console.info(
+		consola.success(
 			`Successfully registered application commands: ${commands
 				.map((command) => command.data.name)
 				.join(", ")}`,
 		);
 	} catch (error) {
-		console.error("Failed to register application commands.");
+		consola.error("Failed to register application commands.");
+		// do not use consola#error to throw Error since it cannot handle line numbers correctly
 		console.error(error);
 		// bun does not exit with a thrown error in listener
 		process.exit(1);
@@ -96,7 +98,7 @@ export const commandsListener = async (interaction: Interaction) => {
 
 	// ignore commands from unauthorized guilds or DMs
 	if (interaction.guildId !== env.DISCORD_GUILD_ID) {
-		console.warn(
+		consola.warn(
 			`Command ${interaction.commandName} was triggered in ${
 				interaction.inGuild() ? "an unauthorized guild" : "DM"
 			}.`,
@@ -132,6 +134,6 @@ export const commandsListener = async (interaction: Interaction) => {
 			return;
 		}
 
-		console.error(`Command ${command.data.name} not found.`);
+		consola.error(`Command ${command.data.name} not found.`);
 	}
 };
