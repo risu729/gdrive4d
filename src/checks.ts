@@ -36,7 +36,7 @@ export const checkEnvs = () => {
  */
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ignore for now
-export  const checkBotStatus = async (client: Client<true>) => {
+export const checkBotStatus = async (client: Client<true>) => {
 	const requiredPermissions = [
 		PermissionFlagsBits.ViewChannel,
 		PermissionFlagsBits.SendMessages,
