@@ -1,6 +1,5 @@
 import { drive_v3 } from "@googleapis/drive";
 import { deepMatch, sleep } from "bun";
-import compareUrls from "compare-urls";
 import {
 	EmbedBuilder,
 	Message,
@@ -14,6 +13,9 @@ import {
 import { GaxiosError } from "gaxios";
 import { driveClient, fileTypes } from "./gdrive";
 import { appendInvisible, decodeAppendedInvisible } from "./util";
+import normalizeUrl, {
+	type Options as NormalizeUrlOptions,
+} from "normalize-url";
 
 /**
  * Extract Google Drive file IDs from a string.
@@ -146,13 +148,28 @@ const createEmbedsMessage = async (
  * @param fileUrls URLs of files to suppress embeds of
  */
 const suppressEmbeds = async (message: Message, fileUrls: string[]) => {
+	const normalizeOptions: NormalizeUrlOptions = {
+		defaultProtocol: "https",
+		normalizeProtocol: true,
+		forceHttps: true,
+		removeExplicitPort: true,
+		stripHash: true,
+		removeQueryParameters: true,
+	};
 	const embedsUrls = message.embeds.map(({ url }) => url);
 	const shouldSuppress =
 		!!embedsUrls.length &&
 		embedsUrls.every(
 			// return false if null, which means the embed is not a link
-			(embedUrl) =>
-				embedUrl && fileUrls.some((fileUrl) => compareUrls(fileUrl, embedUrl)),
+			(embedUrl) => {
+				if (!embedUrl) {
+					return false;
+				}
+				const normalizedEmbedUrl = normalizeUrl(embedUrl, normalizeOptions);
+				return fileUrls.some((fileUrl) =>
+					normalizeUrl(fileUrl, normalizeOptions),
+				);
+			},
 		);
 
 	// do not send a request if no change is needed
