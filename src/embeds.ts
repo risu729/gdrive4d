@@ -165,9 +165,10 @@ const suppressEmbeds = async (message: Message, fileUrls: string[]) => {
 				if (!embedUrl) {
 					return false;
 				}
-				const _normalizedEmbedUrl = normalizeUrl(embedUrl, normalizeOptions);
-				return fileUrls.some((fileUrl) =>
-					normalizeUrl(fileUrl, normalizeOptions),
+				const normalizedEmbedUrl = normalizeUrl(embedUrl, normalizeOptions);
+				return fileUrls.some(
+					(fileUrl) =>
+						normalizedEmbedUrl === normalizeUrl(fileUrl, normalizeOptions),
 				);
 			},
 		);
