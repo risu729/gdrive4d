@@ -11,11 +11,11 @@ import {
 	isJSONEncodable,
 } from "discord.js";
 import { GaxiosError } from "gaxios";
-import { driveClient, fileTypes } from "./gdrive";
-import { appendInvisible, decodeAppendedInvisible } from "./util";
 import normalizeUrl, {
 	type Options as NormalizeUrlOptions,
 } from "normalize-url";
+import { driveClient, fileTypes } from "./gdrive";
+import { appendInvisible, decodeAppendedInvisible } from "./util";
 
 /**
  * Extract Google Drive file IDs from a string.
@@ -165,7 +165,7 @@ const suppressEmbeds = async (message: Message, fileUrls: string[]) => {
 				if (!embedUrl) {
 					return false;
 				}
-				const normalizedEmbedUrl = normalizeUrl(embedUrl, normalizeOptions);
+				const _normalizedEmbedUrl = normalizeUrl(embedUrl, normalizeOptions);
 				return fileUrls.some((fileUrl) =>
 					normalizeUrl(fileUrl, normalizeOptions),
 				);
