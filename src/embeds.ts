@@ -213,63 +213,50 @@ export const updateEmbedsMessage = async (
 		),
 	]);
 
-	// use try-finally to suppress embeds even if an error is thrown
-	try {
-		if (!oldEmbedsMessage) {
-			if (!newEmbedsMessage) {
-				return;
-			}
-
-			await sourceMessage.channel.send(newEmbedsMessage);
-			return;
-		}
-
+	if (!oldEmbedsMessage) {
 		if (!newEmbedsMessage) {
-			await oldEmbedsMessage.delete();
+			// do not suppress embeds if th bot ignores the event
 			return;
 		}
 
-		if (
-			oldEmbedsMessage.embeds?.length === newEmbedsMessage.embeds?.length &&
-			oldEmbedsMessage.embeds?.every(({ data: oldEmbedData }, i) => {
-				const newEmbed = newEmbedsMessage.embeds?.[i];
-				if (!newEmbed) {
-					return false;
-				}
-				const newEmbedData = isJSONEncodable(newEmbed)
-					? newEmbed.toJSON()
-					: newEmbed;
+		await sourceMessage.channel.send(newEmbedsMessage);
+	} else if (!newEmbedsMessage) {
+		await oldEmbedsMessage.delete();
+	} else if (
+		// do not edit if the embeds are the same to avoid `(edited)` in the message
+		oldEmbedsMessage.embeds?.length !== newEmbedsMessage.embeds?.length ||
+		oldEmbedsMessage.embeds?.some(({ data: oldEmbedData }, i) => {
+			const newEmbed = newEmbedsMessage.embeds?.[i];
+			if (!newEmbed) {
+				return true;
+			}
+			const newEmbedData = isJSONEncodable(newEmbed)
+				? newEmbed.toJSON()
+				: newEmbed;
 
-				// do not use Embed#equals because it compares timestamps just as strings
-				return (
-					new Date(oldEmbedData.timestamp ?? 0).getTime() ===
-						new Date(newEmbedData.timestamp ?? 0).getTime() &&
-					// oldEmbedData includes some extra properties like `type` or `content_scan_version`
-					deepMatch(
-						Object.fromEntries(
-							Object.entries(newEmbedData).filter(
-								([key]) => key !== "timestamp",
-							),
-						),
-						oldEmbedData,
-					)
-				);
-			})
-		) {
-			// do not edit if the embeds are the same to avoid `(edited)` in the message
-			return;
-		}
-
-		await oldEmbedsMessage.edit(newEmbedsMessage);
-		return;
-	} finally {
-		// skip when embeds are suppressed in the source message to avoid infinite recursion
-		if (!isEmbedsSuppressed) {
-			await suppressEmbeds(
-				sourceMessage,
-				fileIds.map(({ url }) => url),
+			// do not use Embed#equals because it compares timestamps just as strings
+			return (
+				new Date(oldEmbedData.timestamp ?? 0).getTime() !==
+					new Date(newEmbedData.timestamp ?? 0).getTime() ||
+				// oldEmbedData includes some extra properties like `type` or `content_scan_version`
+				!deepMatch(
+					Object.fromEntries(
+						Object.entries(newEmbedData).filter(([key]) => key !== "timestamp"),
+					),
+					oldEmbedData,
+				)
 			);
-		}
+		})
+	) {
+		await oldEmbedsMessage.edit(newEmbedsMessage);
+	}
+
+	// skip when embeds are suppressed in the source message to avoid infinite recursion
+	if (!isEmbedsSuppressed) {
+		await suppressEmbeds(
+			sourceMessage,
+			fileIds.map(({ url }) => url),
+		);
 	}
 };
 
