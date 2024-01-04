@@ -1,6 +1,5 @@
 import { drive_v3 } from "@googleapis/drive";
 import { deepMatch, sleep } from "bun";
-// @ts-expect-error: no types
 import compareUrls from "compare-urls";
 import {
 	EmbedBuilder,
