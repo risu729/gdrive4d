@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "@googleapis/drive": "8.4.0",
-    "compare-urls": "4.1.0",
     "consola": "3.2.3",
-    "discord.js": "14.14.1"
+    "discord.js": "14.14.1",
+    "normalize-url": "8.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
