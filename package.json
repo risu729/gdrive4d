@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "bun src/main.ts",
+    "start:screen": "screen -DRS gdrive4d bun start",
     "check": "biome check --apply-unsafe ."
   },
   "dependencies": {
