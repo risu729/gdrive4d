@@ -3,7 +3,7 @@ import { consola } from "consola";
 import {
 	ApplicationCommandType,
 	type ChatInputCommandInteraction,
-	Client,
+	type Client,
 	ContextMenuCommandBuilder,
 	type Interaction,
 	type MessageContextMenuCommandInteraction,

@@ -1,13 +1,13 @@
-import { drive_v3 } from "@googleapis/drive";
+import type { drive_v3 } from "@googleapis/drive";
 import { deepMatch, sleep } from "bun";
 import {
 	EmbedBuilder,
-	Message,
-	MessageCreateOptions,
-	MessageEditOptions,
+	type Message,
+	type MessageCreateOptions,
+	type MessageEditOptions,
 	MessageFlags,
 	MessageFlagsBitField,
-	PartialMessage,
+	type PartialMessage,
 	isJSONEncodable,
 } from "discord.js";
 import { GaxiosError } from "gaxios";
@@ -48,7 +48,9 @@ const retrieveOldEmbedsMessage = async (
 	const {
 		channel,
 		id: sourceId,
-		client: { user: { id: botUserId } },
+		client: {
+			user: { id: botUserId },
+		},
 	} = message;
 
 	const history = await channel.messages.fetch({
