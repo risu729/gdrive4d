@@ -1,7 +1,7 @@
 import { env } from "bun";
 import { consola } from "consola";
 import {
-	Client,
+	type Client,
 	OAuth2Scopes,
 	PermissionFlagsBits,
 	PermissionsBitField,

@@ -5,9 +5,9 @@ import {
 	Client,
 	Events,
 	GatewayIntentBits,
-	Message,
+	type Message,
 	MessageFlags,
-	PartialMessage,
+	type PartialMessage,
 	Partials,
 } from "discord.js";
 import { checkBotStatus, checkEnvs } from "./checks";
