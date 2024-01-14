@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Biome
-        uses: biomejs/setup-biome@fbd4c08f9a360b7c371d1688e00fbbffd68d103b # v2.0.0
+        uses: biomejs/setup-biome@7702017cc1f1a9ed7ce79740e6fefa02590dc877 # v2.1.0
 
       - name: Run Biome
         run: biome ci --error-on-warnings .
