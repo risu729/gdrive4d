@@ -8,7 +8,7 @@
     "check": "biome check --apply-unsafe ."
   },
   "dependencies": {
-    "@googleapis/drive": "8.5.0",
+    "@googleapis/drive": "8.6.0",
     "consola": "3.2.3",
     "discord.js": "14.14.1",
     "normalize-url": "8.0.0"
