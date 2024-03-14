@@ -1,24 +1,25 @@
 {
-  "$schema": "https://json.schemastore.org/package.json",
-  "name": "gdrive4d",
-  "private": true,
-  "scripts": {
-    "start": "bun src/main.ts",
-    "start:screen": "screen -DRS gdrive4d bun start",
-    "check": "biome check --apply-unsafe ."
-  },
-  "dependencies": {
-    "@googleapis/drive": "8.7.0",
-    "consola": "3.2.3",
-    "discord.js": "14.14.1",
-    "normalize-url": "8.0.1"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.6.1",
-    "@tsconfig/bun": "1.0.4",
-    "@tsconfig/strictest": "2.0.3",
-    "@types/bun": "1.0.8",
-    "ignore-sync": "7.0.1",
-    "typescript": "5.4.2"
-  }
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "gdrive4d",
+	"private": true,
+	"scripts": {
+		"start": "bun src/main.ts",
+		"start:screen": "screen -DRS gdrive4d bun start",
+		"check": "biome check --apply ."
+	},
+	"dependencies": {
+		"@googleapis/drive": "8.7.0",
+		"consola": "3.2.3",
+		"discord.js": "14.14.1",
+		"gaxios": "6.3.0",
+		"normalize-url": "8.0.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.6.1",
+		"@tsconfig/bun": "1.0.4",
+		"@tsconfig/strictest": "2.0.3",
+		"@types/bun": "1.0.8",
+		"ignore-sync": "7.0.1",
+		"typescript": "5.4.2"
+	}
 }
