@@ -20,7 +20,9 @@
 				"noConsole": "off",
 				// This rule reports bun as an undeclared dependency
 				// ref: https://github.com/biomejs/biome/issues/2074
-				"noUndeclaredDependencies": "off"
+				"noUndeclaredDependencies": "off",
+				// This rule collides with lint/nursery/noBarrelFile
+				"useImportRestrictions": "off"
 			}
 		}
 	},

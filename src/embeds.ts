@@ -15,7 +15,7 @@ import normalizeUrl, {
 	type Options as NormalizeUrlOptions,
 } from "normalize-url";
 import { driveClient, fileTypes } from "./gdrive";
-import { appendInvisible, decodeAppendedInvisible } from "./util";
+import { appendInvisible, decodeAppendedInvisible } from "./util/invisible";
 
 /**
  * Extract Google Drive file IDs from a string.
