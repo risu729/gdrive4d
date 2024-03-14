@@ -1,1 +1,1 @@
-export * from "./invisible";
+export { appendInvisible, decodeAppendedInvisible } from "./invisible";
