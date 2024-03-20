@@ -20,6 +20,6 @@
 		"@tsconfig/strictest": "2.0.3",
 		"@types/bun": "1.0.10",
 		"ignore-sync": "7.0.1",
-		"typescript": "5.4.2"
+		"typescript": "5.4.3"
 	}
 }
