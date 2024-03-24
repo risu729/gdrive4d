@@ -17,7 +17,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.6.1",
 		"@tsconfig/bun": "1.0.4",
-		"@tsconfig/strictest": "2.0.3",
+		"@tsconfig/strictest": "2.0.4",
 		"@types/bun": "1.0.10",
 		"ignore-sync": "7.0.1",
 		"typescript": "5.4.3"
