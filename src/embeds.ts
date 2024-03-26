@@ -208,7 +208,7 @@ export const updateEmbedsMessage = async (
 		isNewlyCreated
 			? undefined
 			: // retry twice because the old embeds might not be sent yet when the source is updated in quick succession
-			  retrieveOldEmbedsMessage(sourceMessage, 2),
+				retrieveOldEmbedsMessage(sourceMessage, 2),
 		createEmbedsMessage(
 			fileIds.map(({ fileId }) => fileId),
 			sourceMessage.id,
