@@ -11,7 +11,7 @@
 		"@googleapis/drive": "8.7.0",
 		"consola": "3.2.3",
 		"discord.js": "14.14.1",
-		"gaxios": "6.3.0",
+		"gaxios": "6.4.0",
 		"normalize-url": "8.0.1"
 	},
 	"devDependencies": {
