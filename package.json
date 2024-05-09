@@ -21,5 +21,6 @@
 		"@types/bun": "1.1.1",
 		"ignore-sync": "7.0.1",
 		"typescript": "5.4.5"
-	}
+	},
+	"trustedDependencies": ["@biomejs/biome"]
 }
