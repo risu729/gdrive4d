@@ -24,7 +24,7 @@ consola.info(`Service account email: ${env.GOOGLE_SERVICE_ACCOUNT_EMAIL}`);
 // test if the client is working, fail fast
 const files = await driveClient.files.list();
 // exit if the service account has access to no files
-if (!files.data.files?.length) {
+if (files.data.files?.length === 0) {
 	consola.warn(
 		"No files are shared to the service account in Google Drive. Share some files to the service account and try again.",
 	);

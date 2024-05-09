@@ -113,7 +113,7 @@ const createEmbedsMessage = async (
 	).then((files) =>
 		files.filter((file): file is drive_v3.Schema$File => file !== undefined),
 	);
-	if (!files.length) {
+	if (files.length === 0) {
 		return;
 	}
 
@@ -160,7 +160,7 @@ const suppressEmbeds = async (message: Message, fileUrls: string[]) => {
 	};
 	const embedsUrls = message.embeds.map(({ url }) => url);
 	const shouldSuppress =
-		!!embedsUrls.length &&
+		embedsUrls.length > 0 &&
 		embedsUrls.every(
 			// return false if null, which means the embed is not a link
 			(embedUrl) => {

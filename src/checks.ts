@@ -19,7 +19,7 @@ export const checkEnvs = () => {
 		"GOOGLE_SERVICE_ACCOUNT_KEY",
 	];
 	const missingEnv = requiredEnvs.filter((name) => !env[name]);
-	if (!missingEnv.length) {
+	if (missingEnv.length === 0) {
 		return;
 	}
 	consola.error(
@@ -62,7 +62,10 @@ export const checkBotStatus = async (client: Client<true>) => {
 		);
 	}
 	if (application.botRequireCodeGrant) {
-		if (!(isInTargetGuild && missingPermissions) || missingPermissions.length) {
+		if (
+			!(isInTargetGuild && missingPermissions) ||
+			missingPermissions.length > 0
+		) {
 			if (isInTargetGuild) {
 				consola.error(
 					`Bot is missing the following required permissions: ${
@@ -113,7 +116,7 @@ export const checkBotStatus = async (client: Client<true>) => {
 	}
 
 	// exit if the bot is missing some required permissions
-	if (!missingPermissions || missingPermissions.length) {
+	if (!missingPermissions || missingPermissions.length > 0) {
 		consola.error(
 			`Bot is missing the following required permissions: ${
 				!missingPermissions || missingPermissions.join(", ")
