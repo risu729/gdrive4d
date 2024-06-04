@@ -5,7 +5,7 @@
 	"scripts": {
 		"start": "bun src/main.ts",
 		"start:screen": "screen -DRS gdrive4d bun start",
-		"check": "biome check --apply ."
+		"check": "biome check --write"
 	},
 	"dependencies": {
 		"@googleapis/drive": "8.8.0",
