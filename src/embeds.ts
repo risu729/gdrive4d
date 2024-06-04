@@ -14,8 +14,8 @@ import { GaxiosError } from "gaxios";
 import normalizeUrl, {
 	type Options as NormalizeUrlOptions,
 } from "normalize-url";
-import { driveClient, fileTypes } from "./gdrive";
-import { appendInvisible, decodeAppendedInvisible } from "./util/invisible";
+import { driveClient, fileTypes } from "./gdrive.ts";
+import { appendInvisible, decodeAppendedInvisible } from "./util/invisible.ts";
 
 /**
  * Extract Google Drive file IDs from a string.

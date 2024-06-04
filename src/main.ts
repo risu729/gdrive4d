@@ -10,10 +10,10 @@ import {
 	type PartialMessage,
 	Partials,
 } from "discord.js";
-import { checkBotStatus, checkEnvs } from "./checks";
-import { commandsListener, registerCommands } from "./commands";
-import { deleteEmbedsMessage, updateEmbedsMessage } from "./embeds";
-import { driveClient } from "./gdrive";
+import { checkBotStatus, checkEnvs } from "./checks.ts";
+import { commandsListener, registerCommands } from "./commands.ts";
+import { deleteEmbedsMessage, updateEmbedsMessage } from "./embeds.ts";
+import { driveClient } from "./gdrive.ts";
 
 consola.start("gdrive4d is starting...");
 

@@ -13,7 +13,7 @@ import {
 	Routes,
 	type UserContextMenuCommandInteraction,
 } from "discord.js";
-import { updateEmbedsMessage } from "./embeds";
+import { updateEmbedsMessage } from "./embeds.ts";
 
 type ExecutableCommand =
 	| {
