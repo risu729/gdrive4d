@@ -10,7 +10,7 @@
 	"dependencies": {
 		"@googleapis/drive": "8.14.0",
 		"consola": "3.2.3",
-		"discord.js": "14.15.3",
+		"discord.js": "14.16.1",
 		"gaxios": "6.7.1",
 		"normalize-url": "8.0.1"
 	},
