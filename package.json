@@ -8,7 +8,7 @@
 		"check": "biome check --apply ."
 	},
 	"dependencies": {
-		"@googleapis/drive": "11.0.0",
+		"@googleapis/drive": "12.0.0",
 		"consola": "3.4.2",
 		"discord.js": "14.18.0",
 		"gaxios": "6.7.1",
